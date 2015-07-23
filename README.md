@@ -3,3 +3,4 @@ A firefox extension which automatically displays the status on Server Not Found 
 Works on FF 34+.
 e10s compatible (probably).
 Features can be requested here or on reddit.
+Based on original addon by antoyo (https://addons.mozilla.org/en-US/firefox/user/antoyo/). 
