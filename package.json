@@ -1,9 +1,0 @@
-{
-  "name": "is_down_for_everyone",
-  "title": "IsUpMe",
-  "id": "jid1-BN0uAYIA3rJY4A",
-  "description": "Displays status of a website when you encounter a server not found error",
-  "author": "vylet",
-  "license": "MPL 2.0",
-  "version": "0.1"
-}

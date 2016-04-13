@@ -1,0 +1,29 @@
+{
+    "applications": {
+        "gecko": {
+            "id": "isupme@vyvl.github.com"
+        }
+    },
+    "name": "Down For Me?",
+    "version": "1.0",
+    "manifest_version": 2,
+    "description": "Checks for a site status using isup.me service",
+    "homepage_url": "https://github.com/vyvl/isupme",
+    "default_locale": "en",
+    "background": {
+        "scripts": [
+            "js/jquery/jquery.js",
+            "src/bg/background.js"
+        ],
+        "persistent": true
+    },
+    "page_action": {
+        "default_icon": { 
+            "16": "icons/default16.ico"
+        }
+    },
+    "permissions": [
+        "webNavigation",
+        "http://isup.me/*"
+    ]
+}
