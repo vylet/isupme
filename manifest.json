@@ -18,12 +18,18 @@
         "persistent": true
     },
     "page_action": {
-        "default_icon": { 
+        "default_icon": {
             "16": "icons/default16.ico"
         }
     },
     "permissions": [
         "webNavigation",
-        "http://isup.me/*"
-    ]
+        "tabs",
+        "http://isup.me/*",
+        "alarms",
+        "storage"
+    ],
+    "options_ui": {
+        "page": "html/options.html"
+    }
 }

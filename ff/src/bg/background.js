@@ -1,19 +1,45 @@
-///<reference path="../../typings/chrome/chrome.d.ts" />
-///<reference path="../../typings/jquery/jquery.d.ts" />
 chrome.webNavigation.onErrorOccurred.addListener(function (error) {
     if (error.frameId == 0) {
-        ajax(error.url, error.tabId);
-        chrome.pageAction.show(error.tabId);
-        chrome.pageAction.onClicked.addListener(function (tab) {
-            chrome.pageAction.setIcon({
-                "tabId": tab.id,
-                "path": icons.def
-            });
-            ajax(error.url, tab.id);
-        });
+        runTests(error.url, error.tabId);
     }
 });
+chrome.storage.local.get(function (items) {
+    var timeout = items['timeout'];
+    console.log(timeout);
+    if (timeout) {
+        monitorForTimeout(timeout);
+    }
+});
+//This method checks for the status of a page
+var monitorForTimeout = function (timeout) {
+    chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
+        chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
+    });
+    chrome.webNavigation.onCommitted.addListener(function (details) {
+        chrome.alarms.clear(details.tabId + "");
+    });
+    chrome.alarms.onAlarm.addListener(function (alarm) {
+        chrome.tabs.get(+alarm.name, function (tab) {
+            runTests(tab.url, tab.id);
+        });
+        chrome.alarms.clear(alarm.name);
+    });
+};
+//Make ajax call, sets pageAction and pageAction click handler 
+var runTests = function (url, tabId) {
+    ajax(url, tabId);
+    chrome.pageAction.show(tabId);
+    chrome.pageAction.onClicked.addListener(function (tab) {
+        chrome.pageAction.setIcon({
+            "tabId": tabId,
+            "path": icons.def
+        });
+        ajax(url, tabId);
+    });
+};
+//A get call to isup.me to fetch the status of current webpage and set the corresponding pageAction.
 var ajax = function (url, tabId) {
+    url = extractDomain(url);
     var status = -2;
     $.get("http://isup.me/" + url).done(function (data) {
         if (data.indexOf("It's just you") > -1) {
@@ -45,7 +71,8 @@ var icons = {
         16: "icons/default16.ico"
     }
 };
-function changeButton(result, tabId) {
+//Sets the pageAction icon with description basd on isupme status returned.
+var changeButton = function (result, tabId) {
     var status = "";
     switch (result) {
         case 1:
@@ -75,4 +102,19 @@ function changeButton(result, tabId) {
     }
     chrome.pageAction.setTitle(obj);
     chrome.pageAction.setIcon(ico);
-}
+};
+//ExtractDomain fetched from http://stackoverflow.com/questions/8498592/extract-root-domain-name-from-string
+//Extract the domain from url. Example : https://in.yahoo.com/index.html => "in.yahoo.com"
+var extractDomain = function (url) {
+    var domain = "";
+    //find & remove protocol (http, ftp, etc.) and get domain
+    if (url.indexOf("://") > -1) {
+        domain = url.split('/')[2];
+    }
+    else {
+        domain = url.split('/')[0];
+    }
+    //find & remove port number
+    domain = domain.split(':')[0];
+    return domain;
+};
