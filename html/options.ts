@@ -5,8 +5,8 @@ var storeValue = (timeout:number) => {
 }
 
 var saveOptions = () =>{
-    var timeout = document.getElementById('timeout').value;
-    storeValue(timeout);
+    var timeout = (<HTMLInputElement>document.getElementById('timeout')).value;
+    storeValue(+timeout);
 } 
 
 

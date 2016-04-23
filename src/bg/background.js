@@ -3,27 +3,24 @@ chrome.webNavigation.onErrorOccurred.addListener(function (error) {
         runTests(error.url, error.tabId);
     }
 });
-chrome.storage.local.get(function (items) {
-    var timeout = items['timeout'];
-    if (timeout) {
-        monitorForTimeout(+timeout);
-    }
+chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
+    chrome.storage.local.get(function (items) {
+        var timeout = items['timeout'];
+        if (timeout) {
+            chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
+        }
+    });
+    ;
 });
-//This method checks for the status of a page
-var monitorForTimeout = function (timeout) {
-    chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-        chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
+chrome.webNavigation.onCommitted.addListener(function (details) {
+    chrome.alarms.clear(details.tabId + "");
+});
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    chrome.tabs.get(+alarm.name, function (tab) {
+        runTests(tab.url, tab.id);
     });
-    chrome.webNavigation.onCommitted.addListener(function (details) {
-        chrome.alarms.clear(details.tabId + "");
-    });
-    chrome.alarms.onAlarm.addListener(function (alarm) {
-        chrome.tabs.get(+alarm.name, function (tab) {
-            runTests(tab.url, tab.id);
-        });
-        chrome.alarms.clear(alarm.name);
-    });
-};
+    chrome.alarms.clear(alarm.name);
+});
 //Make ajax call, sets pageAction and pageAction click handler 
 var runTests = function (url, tabId) {
     ajax(url, tabId);

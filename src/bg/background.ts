@@ -5,17 +5,16 @@ chrome.webNavigation.onErrorOccurred.addListener(function (error) {
 });
 
 
-chrome.storage.local.get((items) => {
+
+
+    chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
+        chrome.storage.local.get((items) => {
     let timeout = items['timeout'];
     if(timeout){
-        monitorForTimeout(+timeout);
+         chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout })
     }
 });
-
-//This method checks for the status of a page
-var monitorForTimeout = (timeout:number) => {
-    chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-        chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
+      ;
     });
 
     chrome.webNavigation.onCommitted.addListener(function (details) {
@@ -27,7 +26,7 @@ var monitorForTimeout = (timeout:number) => {
         });
         chrome.alarms.clear(alarm.name);
     });
-}
+
 
 //Make ajax call, sets pageAction and pageAction click handler 
 var runTests = (url: string, tabId: number) => {

@@ -5,7 +5,7 @@ var storeValue = function (timeout) {
 };
 var saveOptions = function () {
     var timeout = document.getElementById('timeout').value;
-    storeValue(timeout);
+    storeValue(+timeout);
 };
 chrome.storage.local.get('timeout', function (data) {
     $('#timeout').val(data['timeout']);
