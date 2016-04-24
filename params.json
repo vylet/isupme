@@ -1,6 +1,6 @@
 {
-  "name": "Isupme",
+  "name": "Down For Me?",
   "tagline": "",
-  "body": "### Welcome to the addon page.\r\nThanks for installing this addon and you can report issues or request features [here.](https://github.com/vyvl/isupme/issues)\r\n\r\n### Changes\r\nYou can now set a timeout period in the extensions options. This extension will then check for the status of the page if the page doesn't respond in the timeout period. \r\nIf the timeout is less than 0 will make the extension check only when there is an error page.\r\n\r\n\r\n### For other browsers\r\nThis webextension can be easile be ported to chrome , opera and other chromium based browsers. If you want it for a specific browser post your request here.\r\n\r\n",
+  "body": "### Welcome to the \"Down For Me?\" extension page.\r\nThanks for installing this addon and you can report issues or request features [here.](https://github.com/vyvl/isupme/issues)\r\n\r\n### Changes\r\nYou can now set a timeout period in the extensions options. You can access the options in addons page. This extension will then check for the status of the page if the page doesn't respond in the timeout period. \r\nIf the timeout is less than 0 will make the extension check only when there is an error page.\r\n\r\n\r\n### For other browsers\r\nThis webextension can be easile be ported to chrome , opera and other chromium based browsers. If you want it for a specific browser post your request here.\r\n\r\n",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
