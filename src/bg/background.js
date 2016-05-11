@@ -1,26 +1,3 @@
-chrome.webNavigation.onErrorOccurred.addListener(function (error) {
-    if (error.frameId == 0) {
-        runTests(error.url, error.tabId);
-    }
-});
-chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-    chrome.storage.local.get(function (items) {
-        var timeout = items['timeout'];
-        if (timeout) {
-            chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
-        }
-    });
-    ;
-});
-chrome.webNavigation.onCommitted.addListener(function (details) {
-    chrome.alarms.clear(details.tabId + "");
-});
-chrome.alarms.onAlarm.addListener(function (alarm) {
-    chrome.tabs.get(+alarm.name, function (tab) {
-        runTests(tab.url, tab.id);
-    });
-    chrome.alarms.clear(alarm.name);
-});
 //Make ajax call, sets pageAction and pageAction click handler 
 var runTests = function (url, tabId) {
     ajax(url, tabId);
@@ -114,3 +91,42 @@ var extractDomain = function (url) {
     domain = domain.split(':')[0];
     return domain;
 };
+chrome.webNavigation.onErrorOccurred.addListener(function (error) {
+    if (error.frameId == 0) {
+        runTests(error.url, error.tabId);
+    }
+});
+chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
+    chrome.storage.local.get(function (items) {
+        var timeout = items['timeout'];
+        if (timeout) {
+            chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
+        }
+    });
+    ;
+});
+chrome.webNavigation.onCommitted.addListener(function (details) {
+    chrome.alarms.clear(details.tabId + "");
+});
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    chrome.tabs.get(+alarm.name, function (tab) {
+        runTests(tab.url, tab.id);
+    });
+    chrome.alarms.clear(alarm.name);
+});
+chrome.runtime.onMessage.addListener(function (message) {
+    console.log(message);
+    if (message["storage_set"]) {
+        chrome.storage.local.set(message["storage_set"]);
+    }
+    else if (message["storage_get"]) {
+        chrome.storage.local.get(message["storage_get"], function (data) {
+            var storeData = {
+                "storage_fetched": {
+                    "timeout": data[message["storage_get"]]
+                }
+            };
+            chrome.runtime.sendMessage(storeData);
+        });
+    }
+});
