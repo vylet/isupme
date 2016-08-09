@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener((message)=>{
     console.log(message);
     if(message["storage_fetched"]){
         var timeout = message["storage_fetched"]["timeout"];
-        $('#timeout').val(timeout);
+        (<HTMLInputElement>document.getElementById('timeout')).value = timeout;
     }
 })
 

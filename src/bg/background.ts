@@ -15,7 +15,14 @@ var runTests = (url: string, tabId: number) => {
 var ajax = function (url: string, tabId: number) {
     url = extractDomain(url);
     var status: number = -2;
-    $.get("http://isup.me/" + url).done(function (data) {
+    var reqUrl = "http://isup.me/" + url;
+
+
+    var request = new XMLHttpRequest();
+    request.open('GET', reqUrl, true);
+
+    request.onload = function () {
+        var data = this.response;
         if (data.indexOf("It's just you") > -1) {
             status = 1;
             changeButton(status, tabId);
@@ -28,12 +35,15 @@ var ajax = function (url: string, tabId: number) {
             status = 0;
             changeButton(status, tabId);
         }
+    };
 
-    }).fail(function () {
+    request.onerror = function () {
         status = -2;
         changeButton(status, tabId);
-    })
-    return status;
+    };
+
+    request.send();
+
 }
 
 var icons: any = {
@@ -119,8 +129,12 @@ chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
     ;
 });
 
-chrome.webNavigation.onCommitted.addListener(function (details) {
-    chrome.alarms.clear(details.tabId + "");
+chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
+    if (details.frameId == 0) {
+        chrome.alarms.clear(details.tabId + "");
+        if(details.url.indexOf('http')==0)
+            chrome.pageAction.hide(details.tabId);
+    }
 })
 chrome.alarms.onAlarm.addListener(function (alarm) {
     chrome.tabs.get(+alarm.name, function (tab) {
@@ -130,19 +144,3 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 });
 
 
-chrome.runtime.onMessage.addListener((message) => {
-    console.log(message);
-    if(message["storage_set"]){
-        chrome.storage.local.set(message["storage_set"]);
-    }
-    else if(message["storage_get"]){
-        chrome.storage.local.get(message["storage_get"], (data)=>{
-            var storeData = {
-        "storage_fetched": {
-            "timeout": data[message["storage_get"]]
-        }
-    };
-    chrome.runtime.sendMessage(storeData);
-        })
-    }
-})

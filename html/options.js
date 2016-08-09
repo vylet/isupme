@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener(function (message) {
     console.log(message);
     if (message["storage_fetched"]) {
         var timeout = message["storage_fetched"]["timeout"];
-        $('#timeout').val(timeout);
+        document.getElementById('timeout').value = timeout;
     }
 });
 document.querySelector("form").addEventListener("submit", saveOptions);

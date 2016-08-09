@@ -3,5 +3,7 @@
 		"target": "ES5",
 		"out": "js/script.js",
 		"watch": true
-	}
+	},
+	"compileOnSave": true
+	
 }

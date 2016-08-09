@@ -14,7 +14,11 @@ var runTests = function (url, tabId) {
 var ajax = function (url, tabId) {
     url = extractDomain(url);
     var status = -2;
-    $.get("http://isup.me/" + url).done(function (data) {
+    var reqUrl = "http://isup.me/" + url;
+    var request = new XMLHttpRequest();
+    request.open('GET', reqUrl, true);
+    request.onload = function () {
+        var data = this.response;
         if (data.indexOf("It's just you") > -1) {
             status = 1;
             changeButton(status, tabId);
@@ -27,11 +31,12 @@ var ajax = function (url, tabId) {
             status = 0;
             changeButton(status, tabId);
         }
-    }).fail(function () {
+    };
+    request.onerror = function () {
         status = -2;
         changeButton(status, tabId);
-    });
-    return status;
+    };
+    request.send();
 };
 var icons = {
     "-1": {
@@ -105,28 +110,16 @@ chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
     });
     ;
 });
-chrome.webNavigation.onCommitted.addListener(function (details) {
-    chrome.alarms.clear(details.tabId + "");
+chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
+    if (details.frameId == 0) {
+        chrome.alarms.clear(details.tabId + "");
+        if (details.url.indexOf('http') == 0)
+            chrome.pageAction.hide(details.tabId);
+    }
 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
     chrome.tabs.get(+alarm.name, function (tab) {
         runTests(tab.url, tab.id);
     });
     chrome.alarms.clear(alarm.name);
-});
-chrome.runtime.onMessage.addListener(function (message) {
-    console.log(message);
-    if (message["storage_set"]) {
-        chrome.storage.local.set(message["storage_set"]);
-    }
-    else if (message["storage_get"]) {
-        chrome.storage.local.get(message["storage_get"], function (data) {
-            var storeData = {
-                "storage_fetched": {
-                    "timeout": data[message["storage_get"]]
-                }
-            };
-            chrome.runtime.sendMessage(storeData);
-        });
-    }
 });
