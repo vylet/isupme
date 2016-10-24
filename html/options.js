@@ -18,7 +18,6 @@ var storeGetData = {
 // })
 chrome.runtime.sendMessage(storeGetData);
 chrome.runtime.onMessage.addListener(function (message) {
-    console.log(message);
     if (message["storage_fetched"]) {
         var timeout = message["storage_fetched"]["timeout"];
         document.getElementById('timeout').value = timeout;

@@ -5,7 +5,6 @@ chrome.webNavigation.onErrorOccurred.addListener(function (error) {
 });
 chrome.storage.local.get(function (items) {
     var timeout = items['timeout'];
-    console.log(timeout);
     if (timeout) {
         monitorForTimeout(timeout);
     }
