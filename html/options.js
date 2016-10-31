@@ -1,10 +1,5 @@
 var storeValue = function (timeout) {
-    var storeData = {
-        "storage_set": {
-            "timeout": timeout
-        }
-    };
-    chrome.runtime.sendMessage(storeData);
+    chrome.storage.local.set({ timeout });
 };
 var saveOptions = function () {
     var timeout = document.getElementById('timeout').value;
@@ -13,14 +8,8 @@ var saveOptions = function () {
 var storeGetData = {
     "storage_get": "timeout"
 };
-// chrome.storage.local.get('timeout',(data)=>{
-//     $('#timeout').val(data['timeout']);
-// })
-chrome.runtime.sendMessage(storeGetData);
-chrome.runtime.onMessage.addListener(function (message) {
-    if (message["storage_fetched"]) {
-        var timeout = message["storage_fetched"]["timeout"];
-        document.getElementById('timeout').value = timeout;
-    }
-});
+chrome.storage.local.get('timeout',(data)=>{
+    document.getElementById('timeout').value = data['timeout'];
+})
+
 document.querySelector("form").addEventListener("submit", saveOptions);

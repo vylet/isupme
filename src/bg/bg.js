@@ -1,26 +1,10 @@
-//Make ajax call, sets pageAction and pageAction click handler 
-var runTests = (url: string, tabId: number) => {
-    ajax(url, tabId);
-    chrome.pageAction.show(tabId);
-    chrome.pageAction.onClicked.addListener((tab) => {
-        chrome.pageAction.setIcon({
-            "tabId": tabId,
-            "path": icons.def
-        });
-        ajax(url, tabId);
-    });
-}
-
 //A get call to isup.me to fetch the status of current webpage and set the corresponding pageAction.
-var ajax = function (url: string, tabId: number) {
+var ajaxC = function (url, tabId) {
     url = extractDomain(url);
-    var status: number = -2;
+    var status = -2;
     var reqUrl = "http://isup.me/" + url;
-
-
     var request = new XMLHttpRequest();
     request.open('GET', reqUrl, true);
-
     request.onload = function () {
         var data = this.response;
         if (data.indexOf("It's just you") > -1) {
@@ -36,17 +20,25 @@ var ajax = function (url: string, tabId: number) {
             changeButton(status, tabId);
         }
     };
-
     request.onerror = function () {
         status = -2;
         changeButton(status, tabId);
     };
-
     request.send();
-
-}
-
-var icons: any = {
+};
+//Make ajax call, sets pageAction and pageAction click handler 
+var runTests = function (url, tabId) {
+    ajaxC(url, tabId);
+    chrome.pageAction.show(tabId);
+    chrome.pageAction.onClicked.addListener(function (tab) {
+        chrome.pageAction.setIcon({
+            "tabId": tabId,
+            "path": icons.def
+        });
+        ajaxC(url, tabId);
+    });
+};
+var icons = {
     "-1": {
         48: "icons/fail48.ico"
     },
@@ -56,11 +48,10 @@ var icons: any = {
     "def": {
         16: "icons/default16.ico"
     }
-}
-
+};
 //Sets the pageAction icon with description basd on isupme status returned.
-var changeButton = (result: number, tabId: number) => {
-    var status: string = "";
+var changeButton = function (result, tabId) {
+    var status = "";
     switch (result) {
         case 1:
             status = "Site is up. Click here to check again.";
@@ -75,28 +66,25 @@ var changeButton = (result: number, tabId: number) => {
             status = "Status fetch failed. Click here to check again.";
             break;
     }
-    var obj: any = {
+    var obj = {
         "tabId": tabId,
         title: status
     };
-    var ico: any = {
+    var ico = {
         "tabId": tabId,
         path: status
-    }
+    };
     ico.path = icons[result + ""];
     if (!ico.path) {
         ico.path = icons["def"];
     }
     chrome.pageAction.setTitle(obj);
     chrome.pageAction.setIcon(ico);
-}
-
-
+};
 //ExtractDomain fetched from http://stackoverflow.com/questions/8498592/extract-root-domain-name-from-string
 //Extract the domain from url. Example : https://in.yahoo.com/index.html => "in.yahoo.com"
-var extractDomain = (url: string): string => {
-
-    let domain: string = "";
+var extractDomain = function (url) {
+    var domain = "";
     //find & remove protocol (http, ftp, etc.) and get domain
     if (url.indexOf("://") > -1) {
         domain = url.split('/')[2];
@@ -104,43 +92,49 @@ var extractDomain = (url: string): string => {
     else {
         domain = url.split('/')[0];
     }
-
     //find & remove port number
     domain = domain.split(':')[0];
-
-    return domain ;
-
-}
-
+    return domain;
+};
 chrome.webNavigation.onErrorOccurred.addListener(function (error) {
     if (error.frameId == 0) {
         runTests(error.url, error.tabId);
     }
 });
-
-
 chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-    chrome.storage.local.get((items) => {
-        let timeout = items['timeout'];
+    chrome.storage.local.get(function (items) {
+        var timeout = items['timeout'];
         if (timeout) {
-            chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout })
+            chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
         }
     });
     ;
 });
-
 chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
     if (details.frameId == 0) {
         chrome.alarms.clear(details.tabId + "");
-        if(details.url.indexOf('http')==0)
+        if (details.url.indexOf('http') == 0)
             chrome.pageAction.hide(details.tabId);
     }
-})
+});
 chrome.alarms.onAlarm.addListener(function (alarm) {
     chrome.tabs.get(+alarm.name, function (tab) {
         runTests(tab.url, tab.id);
     });
     chrome.alarms.clear(alarm.name);
 });
-
-
+chrome.runtime.onMessage.addListener(function (message) {
+    if (message["storage_set"]) {
+        chrome.storage.local.set(message["storage_set"]);
+    }
+    else if (message["storage_get"]) {
+        chrome.storage.local.get(message["storage_get"], function (data) {
+            var storeData = {
+                "storage_fetched": {
+                    "timeout": data[message["storage_get"]]
+                }
+            };
+            chrome.runtime.sendMessage(storeData);
+        });
+    }
+});

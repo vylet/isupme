@@ -1,7 +1,10 @@
 {
 	"compilerOptions": {
+		"module": "commonjs",
+		"noImplicitAny": true,
 		"target": "ES5",
-		"watch": true
+		"outFile": "./src/bg/bg.js",
+        "sourceMap": false
 	},
 	"compileOnSave": true
 
