@@ -121,13 +121,14 @@ chrome.webNavigation.onErrorOccurred.addListener(function (error) {
 
 
 chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-    chrome.storage.local.get((items) => {
-        let timeout = items['timeout'];
-        if (timeout) {
-            chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout })
-        }
-    });
-    ;
+    if (details.frameId == 0) {
+        chrome.storage.local.get((items) => {
+            let timeout = items['timeout'];
+            if (timeout) {
+                chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout })
+            }
+        });
+    }
 });
 
 chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {

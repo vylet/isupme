@@ -97,21 +97,22 @@ var extractDomain = function (url) {
     return domain;
 };
 chrome.webNavigation.onErrorOccurred.addListener(function (error) {
-    if (error.frameId == 0) {
+    if (error.frameId === 0) {
         runTests(error.url, error.tabId);
     }
 });
 chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-    chrome.storage.local.get(function (items) {
-        var timeout = items['timeout'];
-        if (timeout) {
-            chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
-        }
-    });
-    ;
+    if (details.frameId === 0) {
+        chrome.storage.local.get(function (items) {
+            var timeout = items['timeout'];
+            if (timeout) {
+                chrome.alarms.create(details.tabId + "", { when: Date.now() + timeout });
+            }
+        });
+    }
 });
 chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
-    if (details.frameId == 0) {
+    if (details.frameId === 0) {
         chrome.alarms.clear(details.tabId + "");
         if (details.url.indexOf('http') == 0)
             chrome.pageAction.hide(details.tabId);
@@ -122,19 +123,4 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
         runTests(tab.url, tab.id);
     });
     chrome.alarms.clear(alarm.name);
-});
-chrome.runtime.onMessage.addListener(function (message) {
-    if (message["storage_set"]) {
-        chrome.storage.local.set(message["storage_set"]);
-    }
-    else if (message["storage_get"]) {
-        chrome.storage.local.get(message["storage_get"], function (data) {
-            var storeData = {
-                "storage_fetched": {
-                    "timeout": data[message["storage_get"]]
-                }
-            };
-            chrome.runtime.sendMessage(storeData);
-        });
-    }
 });
