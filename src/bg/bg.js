@@ -97,12 +97,12 @@ var extractDomain = function (url) {
     return domain;
 };
 chrome.webNavigation.onErrorOccurred.addListener(function (error) {
-    if (error.frameId === 0) {
+    if (error.frameId == 0) {
         runTests(error.url, error.tabId);
     }
 });
 chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-    if (details.frameId === 0) {
+    if (details.frameId == 0) {
         chrome.storage.local.get(function (items) {
             var timeout = items['timeout'];
             if (timeout) {
@@ -111,8 +111,8 @@ chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
         });
     }
 });
-chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
-    if (details.frameId === 0) {
+chrome.webNavigation.onCommitted.addListener(function (details) {
+    if (details.frameId == 0) {
         chrome.alarms.clear(details.tabId + "");
         if (details.url.indexOf('http') == 0)
             chrome.pageAction.hide(details.tabId);

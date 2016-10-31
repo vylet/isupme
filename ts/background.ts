@@ -131,7 +131,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
     }
 });
 
-chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
+chrome.webNavigation.onCommitted.addListener(function (details) {
     if (details.frameId == 0) {
         chrome.alarms.clear(details.tabId + "");
         if(details.url.indexOf('http')==0)
