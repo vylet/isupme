@@ -109,13 +109,19 @@ var extractDomain = (url: string): string => {
     //find & remove port number
     domain = domain.split(':')[0];
 
-    return domain ;
+    return domain;
 
 }
 
 chrome.webNavigation.onErrorOccurred.addListener(function (error) {
     if (error.frameId == 0) {
-        runTests(error.url, error.tabId);
+        let reqUrl = error.url;
+        let tabId = error.tabId;
+        chrome.tabs.get(tabId, (tab) => {
+            if (tab.url === reqUrl) {
+                runTests(error.url, error.tabId);
+            }
+        });
     }
 });
 
@@ -133,9 +139,10 @@ chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
 
 chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
     if (details.frameId == 0) {
-        chrome.alarms.clear(details.tabId + "");
-        if(details.url.indexOf('http')==0)
+        if ((details.url.indexOf('http') === 0) || (details.url.indexOf('moz-extension') === 0)) {
+            chrome.alarms.clear(details.tabId + "");
             chrome.pageAction.hide(details.tabId);
+        }
     }
 })
 chrome.alarms.onAlarm.addListener(function (alarm) {

@@ -98,7 +98,13 @@ var extractDomain = function (url) {
 };
 chrome.webNavigation.onErrorOccurred.addListener(function (error) {
     if (error.frameId == 0) {
-        runTests(error.url, error.tabId);
+        var reqUrl_1 = error.url;
+        var tabId = error.tabId;
+        chrome.tabs.get(tabId, function (tab) {
+            if (tab.url === reqUrl_1) {
+                runTests(error.url, error.tabId);
+            }
+        });
     }
 });
 chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
@@ -113,9 +119,10 @@ chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
 });
 chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
     if (details.frameId == 0) {
-        chrome.alarms.clear(details.tabId + "");
-        if (details.url.indexOf('http') == 0)
+        if ((details.url.indexOf('http') === 0) || (details.url.indexOf('moz-extension') === 0)) {
+            chrome.alarms.clear(details.tabId + "");
             chrome.pageAction.hide(details.tabId);
+        }
     }
 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
