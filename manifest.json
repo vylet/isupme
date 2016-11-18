@@ -5,7 +5,7 @@
         }
     },
     "name": "IsUp.Me",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "manifest_version": 2,
     "description": "Checks for a site status using isup.me service",
     "homepage_url": "https://github.com/vyvl/isupme",
