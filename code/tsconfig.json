@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "noImplicitAny": true,
+    "target": "esnext",
+    "outFile": "./extension/src/bg/bg.js",
+    "sourceMap": false,
+    "typeRoots": ["@types", "node_modules/web-ext-types"],
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.promise",
+      "es2015.generator",
+      "es2015.core",
+      "es2015.collection",
+      "es2015.iterable",
+      "es2015.promise",
+      "es2015.proxy",
+      "es2015.reflect",
+      "es2015.generator",
+      "es2015.symbol",
+      "es2015.symbol.wellknown"
+    ]
+  }
+}

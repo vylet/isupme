@@ -4,17 +4,16 @@
             "id": "isupme@vyvl.github.com"
         }
     },
-    "name": "IsUp.Me",
-    "version": "2.0.3",
+    "name": "Down For Me?",
+    "version": "3.0.0",
     "manifest_version": 2,
     "description": "Checks for a site status using isup.me service",
     "homepage_url": "https://github.com/vyvl/isupme",
     "default_locale": "en",
     "background": {
         "scripts": [
-            "src/bg/bg.js"           
-        ],
-        "persistent": true
+            "src/bg/bg.js"
+        ]
     },
     "page_action": {
         "default_icon": {
@@ -23,8 +22,10 @@
     },
     "permissions": [
         "webNavigation",
+        "webRequest",
+        "webRequestBlocking",
         "tabs",
-        "http://isup.me/*",
+        "http://downforeveryoneorjustme.com/*",
         "alarms",
         "storage"
     ],
