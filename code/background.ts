@@ -175,7 +175,7 @@ class IconProvider {
     static getIcon(status: Status) {
         switch (status) {
             case Status.Online:
-                return "icons/fail48.ico";
+                return "icons/tick48.ico";
             case Status.Offline:
                 return "icons/fail48.ico";
             default:

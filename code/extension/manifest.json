@@ -5,7 +5,7 @@
         }
     },
     "name": "Down For Me?",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "manifest_version": 2,
     "description": "Checks for a site status using isup.me service",
     "homepage_url": "https://github.com/vyvl/isupme",
